@@ -1,0 +1,15 @@
+{
+    "name": "ligth_engine/src",
+    "authors": [
+        {
+            "name": "Аюпов Аяз",
+            "email": "ayaz.ayupov@gmail.com"
+        }
+    ],
+    "autoload" : {
+        "psr-4": {
+            "App\\" : "src/"
+        }
+    },
+    "require": {}
+}
