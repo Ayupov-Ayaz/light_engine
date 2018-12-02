@@ -17,6 +17,8 @@ class DbQueries
      */
     protected $pdo;
 
+    protected $queryBuilder;
+
     /**
      * DbQueries constructor.
      * @param DbConnection $dbConnection
@@ -24,6 +26,7 @@ class DbQueries
     public function __construct(DbConnection $dbConnection)
     {
         $this->pdo = $dbConnection->getConnection();
+        $this->queryBuilder = QueryBuilder::getInstance();
     }
 
     /**
@@ -38,28 +41,62 @@ class DbQueries
 
     /**
      * Получить строку результата
-     * @param $table - таблица
-     * @param $where
-     * @param array $params
-     * @return mixed
+     * @param string $table - запрос будет адресован этой таблице
+     * @param string | array $where - необходимо передавать в формате id = :id
+     * @param array $params - параметры для $where и $columns
+     * @return array
      */
     public function queryRow($table, $where, $params = []){
-        $query = $this->buildQuery('select', $table, $where);
+        $query = $this->queryBuilder->select($table)->where($where)->build();
         $stm = $this->query($query, $params);
         return $stm->fetch();
     }
 
     /**
      * Отправляет запрос на получение колонки из таблицы
-     * @param $table
-     * @param $column
-     * @param $where
-     * @return string | bool
+     * @param string $table - запрос будет адресован этой таблице
+     * @param string | array $columns
+     * @param string | array $where - необходимо передавать в формате id = :id
+     * @param array $params - параметры для $where и $columns
+     * @return array | mixed
      */
-    public function queryGetValue($table, $column, $where, $params = []) {
-        $query = $this->buildQuery('select', $table, $where, $column);
+    public function queryGetValue($table, $columns, $where, $params = []) {
+        $this->queryBuilder->select($table, $columns)->where($where);
+        $query = $this->queryBuilder->build();
+        dd($query);
         $stm =  $this->query($query, $params);
+        if(empty($where)) {
+           return $stm->fetchAll(PDO::FETCH_COLUMN);
+        }
         return $stm->fetchColumn();
+    }
+
+
+    /**
+     * Обновление.
+     * @param string $table - запрос будет адресован этой таблице
+     * @param string | array $columns
+     * @param string | array $where - необходимо передавать в формате id = :id
+     * @param array $params - параметры для $where и $columns
+     * @return int - сколько строк обновлено
+     */
+    public function update($table, $columns, $where, $params) {
+        $query = $this->queryBuilder->update($table,$columns)->where($where)->build();
+        $stm = $this->query($query, $params);
+        return $stm->rowCount();
+    }
+
+    /**
+     * Удаление
+     * @param string $table - запрос будет адресован этой таблице
+     * @param string | array $where - необходимо передавать в формате id = :id
+     * @param array $params - параметры для $where и $columns
+     * @return int - сколько строк обновлено
+     */
+    public function delete($table, $where, $params){
+        $query = $this->queryBuilder->delete($table)->where($where)->build();
+        $stm = $this->query($query, $params);
+        return $stm->rowCount();
     }
 
     /**
@@ -77,32 +114,4 @@ class DbQueries
         }
         return $stm;
     }
-
-    /**
-     * Построитель запросов
-     * @param $table
-     * @param string $columns
-     * @param $where
-     * @return string
-     */
-    private function buildQuery($operation, $table, $where = null, $columns = '*') {
-        $sql = '';
-        switch ($operation) {
-            case 'select' :
-                $sql = $operation . ' ' . $columns . ' from ' . $table . (isset($where) ? ' where ' . $where : '');
-                break;
-            case 'insert' :
-                $sql = '';
-                break;
-            case 'update' :
-                $sql = '';
-                break;
-            case 'delete' :
-                $sql = '';
-                break;
-        }
-        return $sql;
-    }
-
-
 }
