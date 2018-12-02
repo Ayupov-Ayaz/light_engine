@@ -8,7 +8,7 @@
 
 namespace App\lib\db;
 
-interface iSingletonDbConnection
+interface iSingleton
 {
     /**
      * Singleton connection to database

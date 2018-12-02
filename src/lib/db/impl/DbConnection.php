@@ -9,10 +9,10 @@
 namespace App\lib\db\impl;
 
 
-use App\lib\db\iSingletonDbConnection;
+use App\lib\db\iSingleton;
 use PDO;
 
-class DbConnection implements iSingletonDbConnection
+class DbConnection implements iSingleton
 {
     /**
      * @var bool
