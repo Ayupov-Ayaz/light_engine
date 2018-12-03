@@ -15,11 +15,16 @@ return array(
       'method'     => 'get',
     ],
 
-    // Авторизация
+    // Авторизация показать форму
     'login/in' => [
         'controller' => 'login',
         'action'     => 'in',
         'method'     => 'get',
     ],
 
+    'login/auth' => [
+        'controller' => 'login',
+        'action'     => 'auth',
+        'method'     => 'post'
+    ]
 );

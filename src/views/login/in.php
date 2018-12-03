@@ -3,7 +3,7 @@
     <div class="row">
 
         <div class="col-md-offset-3 col-md-6">
-            <form class="form-horizontal">
+            <form class="form-horizontal" method="post" action="/login/auth">
                 <span class="heading">АВТОРИЗАЦИЯ</span>
                 <div class="form-group">
                     <input type="email" class="form-control" id="inputEmail" placeholder="E-mail">
