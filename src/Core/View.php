@@ -82,10 +82,17 @@ class View {
 
     /**
      * Отправка JSON ответа http-клиенту
-     * @param $status
-     * @param $message
+     * @param $status string
+     * @param $message string | array
      */
     public function response($status, $message) {
+        if(is_array($message)) {
+            if(isset($message['message'])) {
+                foreach ($message as $status => $_message) {
+                    echo json_encode(['status' => $status, 'message' => $_message]);
+                }
+            }
+        }
         echo json_encode(['status' => $status, 'message' => $message]);
     }
 
