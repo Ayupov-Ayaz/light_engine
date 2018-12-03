@@ -97,4 +97,19 @@ class View {
         exit(json_encode(['url' => $url]));
     }
 
+    /**
+     * Сменить стандартный шаблон
+     * @param $layoutName
+     * @return bool
+     */
+    public function setLayout($layoutName) {
+        $layoutName = $layoutName . '.php';
+        $path = layout_path($layoutName);
+        if(!file_exists($path)) {
+            return false;
+        }
+        $this->layout = $layoutName;
+        return true;
+    }
+
 }
