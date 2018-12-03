@@ -29,6 +29,10 @@ class AccessControl
         }
     }
 
+    /**
+     * Проверка доступа на контроллер
+     * @return bool
+     */
     public function checkAccess(){
         if(in_array('all', $this->access)) return true;
         elseif(in_array('gust', $this->access)) return true;
@@ -51,6 +55,9 @@ class AccessControl
      * @return bool
      */
     public function authorized(){
+        if(isset($_SESSION['authorization']['login']) && isset($_SESSION['authorization']['id'])) {
+            return true;
+        }
         return false;
     }
 
