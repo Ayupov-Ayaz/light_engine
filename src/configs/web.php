@@ -10,5 +10,8 @@ return [
   'views' => [
       // имя шаблона используется по умолчанию
       'layout_name' => 'default.php'
-  ]
+  ],
+  'models' => [
+      'namespace' => 'App\Models'
+  ],
 ];
