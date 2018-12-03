@@ -81,12 +81,20 @@ class View {
     }
 
     /**
-     * Отправка ответа http-клиенту
+     * Отправка JSON ответа http-клиенту
      * @param $status
      * @param $message
      */
     public function response($status, $message) {
         echo json_encode(['status' => $status, 'message' => $message]);
+    }
+
+    /**
+     * Отправка url в формате JSON
+     * @param $url
+     */
+    public function location($url) {
+        exit(json_encode(['url' => $url]));
     }
 
 }
