@@ -22,9 +22,9 @@ if(!function_exists('view_path')) {
      * @param string $sub_folder - продолжение пути, должен заканчиваться на имя файла с расришением
      * @return string
      */
-    function view_path(string $sub_folder = '') {
-        $url_configs = get_configs('path');
-        return $url_configs['views'] . '/' . $sub_folder;
+    function view_path($sub_folder = '') {
+        $view_configs = get_configs('views');
+        return $view_configs['views_path'] . '/' . $sub_folder;
     }
 }
 
@@ -34,7 +34,7 @@ if(!function_exists('layout_path')) {
      * @param string $path - продолжение пути, должен заканчиваться на полное имя класса с расширением
      * @return string
      */
-    function layout_path(string $path) {
+    function layout_path($path) {
         return view_path('layouts/' . $path);
     }
 }

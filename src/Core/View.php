@@ -82,10 +82,17 @@ class View {
 
     /**
      * Отправка JSON ответа http-клиенту
-     * @param $status
-     * @param $message
+     * @param $status string
+     * @param $message string | array
      */
     public function response($status, $message) {
+        if(is_array($message)) {
+            if(isset($message['message'])) {
+                foreach ($message as $status => $_message) {
+                    echo json_encode(['status' => $status, 'message' => $_message]);
+                }
+            }
+        }
         echo json_encode(['status' => $status, 'message' => $message]);
     }
 
@@ -95,6 +102,21 @@ class View {
      */
     public function location($url) {
         exit(json_encode(['url' => $url]));
+    }
+
+    /**
+     * Сменить стандартный шаблон
+     * @param $layoutName
+     * @return bool
+     */
+    public function setLayout($layoutName) {
+        $layoutName = $layoutName . '.php';
+        $path = layout_path($layoutName);
+        if(!file_exists($path)) {
+            return false;
+        }
+        $this->layout = $layoutName;
+        return true;
     }
 
 }
