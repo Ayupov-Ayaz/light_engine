@@ -35,7 +35,7 @@ class AccessControl
      */
     public function checkAccess(){
         if(in_array('all', $this->access)) return true;
-        elseif(in_array('gust', $this->access)) return true;
+        elseif(in_array('gust', $this->access) && !$this->authorized()) return true;
         elseif ($this->authorized() && in_array('authorize', $this->access)) return true;
         elseif ($this->isAdmin() && in_array('admin', $this->access)) return true;
         else return false;
