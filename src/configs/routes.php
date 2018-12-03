@@ -13,6 +13,9 @@ return array(
       'controller' => 'main',
       'action'     => 'index',
       'method'     => 'get',
+      'access'     => [
+          'all'
+      ]
     ],
 
     // Авторизация показать форму
@@ -20,6 +23,9 @@ return array(
         'controller' => 'login',
         'action'     => 'in',
         'method'     => 'get',
+        'access'     => [
+            'gust'
+        ]
     ],
 
     'login/auth' => [
