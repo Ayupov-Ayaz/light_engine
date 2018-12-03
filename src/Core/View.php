@@ -67,14 +67,26 @@ class View {
         http_response_code($code);
         $title = 'Страница не найдена';
         $views_configs = get_configs('views');
-        require  layout_path($views_configs['layout_name']);
+        $path = layout_path($views_configs['layout_name']);
+        if(file_exists($path)) {
+            require $path;
+        }
         $path = view_path('errors/' . $code . '.php');
         if(!file_exists($path)) {
             $title = 'Непредвиденная ошибка!';
             exit;
         }
-        require  view_path('errors/' . $code . '.php');
+        require  $path;
         exit;
+    }
+
+    /**
+     * Отправка ответа http-клиенту
+     * @param $status
+     * @param $message
+     */
+    public function response($status, $message) {
+        echo json_encode(['status' => $status, 'message' => $message]);
     }
 
 }
