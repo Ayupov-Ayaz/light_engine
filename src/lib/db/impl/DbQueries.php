@@ -53,6 +53,20 @@ class DbQueries
     }
 
     /**
+     * Получить несколько полей в качестве результата запроса.
+     * @param $table string
+     * @param $columns array
+     * @param $where string
+     * @param array $params
+     * @return mixed
+     */
+    public function queryGetColumns($table, $columns, $where, $params = []) {
+        $query = $this->queryBuilder->select($table, $columns)->where($where)->build();
+        $stm = $this->query($query, $params);
+        return $stm->fetch();
+    }
+
+    /**
      * Отправляет запрос на получение колонки из таблицы
      * @param string $table - запрос будет адресован этой таблице
      * @param string | array $columns
@@ -105,7 +119,7 @@ class DbQueries
      * @param array $params
      * @return false| \PDOStatement
      */
-    private function query($query, $params = []) {
+    public function query($query, $params = []) {
         $stm = $this->pdo->prepare($query);
         if(!empty($params)) {
             $stm->execute($params);
