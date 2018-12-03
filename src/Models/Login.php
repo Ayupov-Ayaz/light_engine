@@ -45,7 +45,7 @@ class Login extends Model
         if(!empty($this->errors)) {
             return $this->errors;
         }
-       return $this->dbQueries->queryGetColumns($this->table,['login', 'password'],
+       return $this->dbQueries->queryGetColumns($this->table,['id', 'login', 'password'],
            'login = :login', ['login' => $login] );
     }
 
