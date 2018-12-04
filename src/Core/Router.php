@@ -54,7 +54,10 @@ class Router {
 
         $url = trim($url, '/');
         foreach ($this->routes as $route => $params) {
-            if(preg_match($route, $url, $matches)) {
+            if(preg_match($route, $url)) {
+                if($_SERVER['REQUEST_METHOD'] != strtoupper($params['method'])) {
+                    return false;
+                }
                 $this->params = $params;
                 return true;
             }
