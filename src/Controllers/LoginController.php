@@ -43,7 +43,12 @@ class LoginController extends Controller
             exit();
         }
 
-        $password = md5($password . $auth_conf['encryption_key']);
+        if($auth_conf['use_md5']) {
+            $password = md5($password . $auth_conf['encryption_key']);
+        } else {
+            $password = password_hash($password . $auth_conf['encryption_key'], PASSWORD_DEFAULT);
+        }
+
         // пароли не совпали
         if(! $password == $auth_data['password']) {
             $this->view->response(400, 'Не правильно введен пароль. Попробуйте снова.');
