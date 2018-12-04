@@ -121,11 +121,27 @@ class DbQueries
      */
     public function query($query, $params = []) {
         $stm = $this->pdo->prepare($query);
+        $params = $this->clearParams($params);
         if(!empty($params)) {
             $stm->execute($params);
         } else {
             $stm->execute();
         }
         return $stm;
+    }
+
+    /**
+     * Обработка параметров
+     * @param $params array
+     * @return array
+     */
+    public function clearParams($params) {
+        if(!is_array($params)) {
+            return [];
+        }
+        foreach ($params as $key => $val) {
+            $params[$key] = trim(htmlspecialchars($val));
+        }
+        return $params;
     }
 }
