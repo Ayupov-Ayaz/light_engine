@@ -9,7 +9,8 @@
 return array(
 
     // Главная
-    '' => [
+    'main' => [
+      'route'      => '',
       'controller' => 'main',
       'action'     => 'index',
       'method'     => 'get',
@@ -19,7 +20,8 @@ return array(
     ],
 
     // Авторизация показать форму
-    'login/in' => [
+    'show_authorization_page' => [
+        'route'      => 'login/in',
         'controller' => 'login',
         'action'     => 'in',
         'method'     => 'get',
@@ -29,7 +31,8 @@ return array(
     ],
 
     // Авторизация
-    'login/auth' => [
+    'authorization' => [
+        'route'      => 'login/auth',
         'controller' => 'login',
         'action'     => 'auth',
         'method'     => 'post',
