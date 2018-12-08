@@ -34,21 +34,21 @@ class Router {
     public function __construct() {
         $routes_array     = require dirname(__DIR__). '/configs/routes.php';
 
-        foreach($routes_array as $route => $params) {
-            $this->add($route, $params);
+        foreach($routes_array as $routeName => $params) {
+            $this->add($routeName, $params);
         }
 
     }
 
     /**
      * Добавление маршрутов
-     * @param $route
-     * @param $params
+     * @param $routeName string
+     * @param $params array
      */
-    protected function add($route, $params) {
+    protected function add($routeName, $params) {
         // сохраняем как регулярку
-        $route = '#^' . $route . '$#';
-        $this->routes[$route] = $params;
+        $params['reg_route'] = '#^' . $params['route'] . '$#';
+        $this->routes[$routeName] = $params;
     }
 
     /**
@@ -57,11 +57,9 @@ class Router {
      * @return bool
      */
     public function match() {
-        $url = current_url();
-
-        $url = trim($url, '/');
-        foreach ($this->routes as $route => $params) {
-            if(preg_match($route, $url)) {
+        $url = trim(current_url(), '/');
+        foreach ($this->routes as $params) {
+            if(preg_match($params['reg_route'], $url)) {
                 if($_SERVER['REQUEST_METHOD'] != strtoupper($params['method'])) {
                     return false;
                 }
@@ -96,7 +94,8 @@ class Router {
             $this->accessControl = new AccessControl($this->params);
             if(!$this->accessControl->checkAccess()) {
                 if(in_array('authorize', $this->accessControl->getRouteAccess())) {
-                    redirect('/login/in');
+                    $url = base_url($this->routes['show_authorization_page']['route']);
+                    redirect($url);
                     exit();
                 }
                 View::errorCode(403);
