@@ -61,5 +61,12 @@ class AccessControl
         return false;
     }
 
+    /**
+     * Получить уровень доступа требуемый для текущего маршрута
+     * @return array
+     */
+    public function getRouteAccess() {
+        return $this->access;
+    }
 
 }

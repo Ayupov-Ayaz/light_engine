@@ -95,9 +95,12 @@ class Router {
             // проверяем доступ пользователя к этому маршруту
             $this->accessControl = new AccessControl($this->params);
             if(!$this->accessControl->checkAccess()) {
+                if(in_array('authorize', $this->accessControl->getRouteAccess())) {
+                    redirect('/login/in');
+                    exit();
+                }
                 View::errorCode(403);
             }
-
             $controller = new $controller_path($this->params);
             $controller->$action();
 

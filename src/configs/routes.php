@@ -14,7 +14,7 @@ return array(
       'action'     => 'index',
       'method'     => 'get',
       'access'     => [
-          'all'
+          'authorize'
       ]
     ],
 
