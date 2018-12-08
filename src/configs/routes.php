@@ -28,9 +28,13 @@ return array(
         ]
     ],
 
+    // Авторизация
     'login/auth' => [
         'controller' => 'login',
         'action'     => 'auth',
-        'method'     => 'post'
+        'method'     => 'post',
+        'access'     => [
+            'gust'
+        ]
     ]
 );
