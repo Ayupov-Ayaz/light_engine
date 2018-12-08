@@ -14,7 +14,7 @@ if(! function_exists('current_url')) {
     /**
      * Возвращает текущий URI
      * @param bool $with_method - вернуть ли в виде массива с методом
-     * @return array ['uri', 'method']
+     * @return string / array ['uri', 'method']
      */
     function current_url($with_method = false) {
 
