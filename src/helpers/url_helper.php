@@ -3,9 +3,9 @@
 if(! function_exists('base_url')) {
     function base_url($url = '') {
         return sprintf(
-            "%s://%s/",
+            "%s://%s:%d/%s/",
             isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
-            $_SERVER['SERVER_NAME']
+            $_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT'], $url
         );
     }
 }
