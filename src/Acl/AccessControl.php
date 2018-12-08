@@ -18,12 +18,12 @@ class AccessControl
 
     /**
      * AccessControl constructor.
-     * @param $route
+     * @param $routeParams
      */
-    public function __construct($route)
+    public function __construct($routeParams)
     {
-        if(isset($route['access'])) {
-            $this->access =  $route['access'];
+        if(isset($routeParams['access'])) {
+            $this->access =  $routeParams['access'];
         } else {
             $this->access = ['gust'];
         }
