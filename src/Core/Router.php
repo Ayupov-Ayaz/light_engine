@@ -7,6 +7,8 @@
  */
 
 namespace App\Core;
+use App\Acl\AccessControl;
+
 require dirname(__DIR__) .'/helpers/url_helper.php';
 
 class Router {
@@ -22,6 +24,10 @@ class Router {
      */
     protected $params = [];
 
+    /**
+     * @var AccessControl
+     */
+    protected $accessControl;
     /**
      * Router constructor.
      */
@@ -47,6 +53,7 @@ class Router {
 
     /**
      * Проверить на существование маршрута
+     * Если маршрут существует, то заполняются параметры по этому маршруту
      * @return bool
      */
     public function match() {
@@ -83,6 +90,12 @@ class Router {
             $action = $this->params['action'] . 'Action';
             if(!method_exists($controller_path, $action)) {
                 View::errorCode(404);
+            }
+
+            // проверяем доступ пользователя к этому маршруту
+            $this->accessControl = new AccessControl($this->params);
+            if(!$this->accessControl->checkAccess()) {
+                View::errorCode(403);
             }
 
             $controller = new $controller_path($this->params);

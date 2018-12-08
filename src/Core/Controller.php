@@ -1,8 +1,6 @@
 <?php
 namespace App\Core;
 
-use App\Acl\AccessControl;
-
 abstract class Controller {
 
     /**
@@ -21,15 +19,10 @@ abstract class Controller {
     protected $model;
 
     /**
-     * @var AccessControl
-     */
-    protected $acl;
-    /**
      * Controller constructor.
      * @param $route
      */
     public function __construct($route) {
-        $this->acl = new AccessControl($route);
         $this->route = $route;
         $this->view = new View($route);
         $this->model = $this->loadModel($route['controller']);
@@ -43,6 +36,9 @@ abstract class Controller {
         return $this->route;
     }
 
+    /**
+     * Подключение модельки
+     */
     protected function loadModel($name) {
         $config = get_configs('models');
         $model_path = $config['namespace'] . '\\' . ucfirst($name);
