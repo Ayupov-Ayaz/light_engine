@@ -10,6 +10,8 @@ namespace App\lib\db\impl;
 
 
 use App\lib\db\iSingleton;
+use App\lib\Validator;
+use Exception;
 use PDO;
 class DbConnection implements iSingleton
 {
@@ -48,6 +50,14 @@ class DbConnection implements iSingleton
      */
     private static $password;
     /**
+     * @var string
+     */
+    private static $dsn;
+    /**
+     * @var array
+     */
+    private static $options;
+    /**
      * @var array connection or connection params errors
      */
     private static $errors;
@@ -71,29 +81,11 @@ class DbConnection implements iSingleton
      */
     private function __construct()
     {
-        switch (self::$driver) {
-            case 'sqlsrv':
-                $dsn = self::$driver . ':Server=' . self::$host;
-                if(self::$docker_link_connection) { $dsn .= ',' . self::$port; }
-                 $dsn .= ';Database=' . self::$database;
-                break;
-
-            case 'mysql':
-                $dsn = self::$driver . ':host=' . self::$host;
-                if(self::$docker_link_connection) { $dsn .= ';port=' . self::$port; }
-                $dsn .= ';dbname=' . self::$database . ';charset=' . $this->charset;
-                $options [PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-                break;
-
-            default:
-                self::$errors[] = 'Не найден подходящий database driver! В файле .env указан "' . getenv('DB_DRIVER') .'"';
-                $dsn = null;
-                return;
+        try{
+            $this->connection = new PDO(self::$dsn, self::$user, self::$password, self::$options);
+        } catch (Exception $e) {
+            dd($e->getMessage() .':'. self::$dsn);
         }
-        // общие для всех параметры
-        $options[PDO::ATTR_DEFAULT_FETCH_MODE] = PDO::FETCH_ASSOC;
-        $options[PDO::ATTR_EMULATE_PREPARES] = false;
-        $this->connection = new PDO($dsn, self::$user, self::$password, $options);
     }
 
     /**
@@ -102,14 +94,23 @@ class DbConnection implements iSingleton
      */
     public static function getInstance() {
         if(!self::$instance) {
-            self::setDatabaseParams();
-            self::$instance = new self();
-            if(!empty(self::$errors)) {
-                foreach(self::$errors as $error) {
+            $showErrors = function($errors) {
+                foreach($errors as $error) {
                     echo $error . "<br>";
                 }
                 exit();
+            };
+            self::setDatabaseParams();
+            // ошибки на уровке текущего класса
+            if(!empty(self::$errors)) {
+                $showErrors(self::$errors);
             }
+            // ошибки на уровне валидатора
+            if(!self::checkConnectionParams()) {
+                $showErrors(Validator::getErrors());
+            }
+
+            self::$instance = new self();
         }
         return self::$instance;
     }
@@ -123,6 +124,11 @@ class DbConnection implements iSingleton
     }
 
     private static function setDatabaseParams() {
+
+        if(getenv('USING_DOCKER_SERVICE_LINK')) {
+            self::$docker_link_connection = true;
+        }
+
         switch (strtolower(getenv('DB_DRIVER'))) {
             /**     MYSQL    **/
             case 'mysql':
@@ -132,6 +138,12 @@ class DbConnection implements iSingleton
                 self::$port     = getenv('MYSQL_PORT');
                 self::$user     = getenv('MYSQL_USER');
                 self::$password = getenv('MYSQL_PASSWORD');
+                //dsn
+                self::$dsn = self::$driver . ':host=' . self::$host;
+                if(!self::$docker_link_connection) { self::$dsn .= ';port=' . self::$port; }
+                self::$dsn .= ';dbname=' . self::$database . ';charset=' . self::$charset;
+                //options
+                self::$options [PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
                 break;
 
             /**     MSSQL    **/
@@ -143,12 +155,29 @@ class DbConnection implements iSingleton
                 self::$port     = getenv('MSSQL_PORT');
                 self::$user     = getenv('MSSQL_USER');
                 self::$password = getenv('MSSQL_PASSWORD');
-            break;
+                //dsn
+                self::$dsn = self::$driver . ':Server=' . self::$host;
+                if(!self::$docker_link_connection) { self::$dsn .= ',' . self::$port; }
+                self::$dsn .= ';Database=' . self::$database;
+                break;
+            default:
+                self::$errors[] = 'Не найден подходящий database driver! В файле .env указан "' . getenv('DB_DRIVER') .'"';
+                return;
         }
+        // общие для всех параметры
+        self::$options[PDO::ATTR_DEFAULT_FETCH_MODE] = PDO::FETCH_ASSOC;
+        self::$options[PDO::ATTR_EMULATE_PREPARES] = false;
+    }
 
-        if(getenv('USING_DOCKER_SERVICE_LINK')) {
-            self::$docker_link_connection = true;
+    private static function checkConnectionParams() {
+        Validator::validate(self::$user,'username', 'required');
+        Validator::validate(self::$password,'password', 'required');
+        Validator::validate(self::$host, 'host','required');
+        Validator::validate(self::$database, 'database','required');
+        if(Validator::hasErrors()) {
+            return false;
         }
+        return true;
     }
 
 }
