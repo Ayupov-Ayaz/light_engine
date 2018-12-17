@@ -24,12 +24,12 @@ class Validator
 
     /**
      * @param $var
+     * @param $paramName
      * @param $options string | array
      * @param string $separator
      * @return bool
-     * @throws ValidateException
      */
-    public static function validate($var, $options, $separator = '|') {
+    public static function validate($var, $paramName, $options, $separator = '|') {
         if(is_string($options)) {
             $options = explode($separator, $options);
         }
@@ -46,7 +46,7 @@ class Validator
                 // Обязательно заполнено
                 case 'required':
                     if(empty($var)) {
-                        self::$errors[] = 'Не заполнена!';
+                        self::$errors[] = $paramName . ' - не заполнена!';
                     }
                     break;
 
@@ -55,7 +55,7 @@ class Validator
                 case 'str':
                     self::$var_type = 'str';
                     if(!is_string($var)) {
-                        self::$errors[] = 'Не являетится строкой!';
+                        self::$errors[] = $paramName . '- не являетится строкой!';
                     }
                     break;
 
@@ -64,11 +64,11 @@ class Validator
                 case 'integer':
                 case 'int':
                     if(self::$var_type == 'str') {
-                        $throw_error('Нельзя указывать несколько типов для проверки!');
+                        $throw_error("Для $paramName Нельзя указывать несколько типов для проверки!");
                     }
                     self::$var_type = 'int';
                     if(!is_integer($var)) {
-                        self::$errors[] = 'Не является числом!';
+                        self::$errors[] = '$paramName - не является числом!';
                     }
                     break;
 
@@ -77,14 +77,12 @@ class Validator
                     $number = self::getIntInParam($option);
                     if(self::$var_type === 'int') {
                         if(! (int)$var >= $number) {
-                            self::$errors[] = 'Число должно быть больше "' . $number . '"';
-                        }
-                    } elseif (self::$var_type === 'str') {
-                        if(!self::min($var, $number)) {
-                            self::$errors[] = 'Строка должна быть не меньше ' . $number;
+                            self::$errors[] = "$paramName должнен быть больше чем \"$number\" ";
                         }
                     } else {
-                        $throw_error('Для проверки на min нужно указать тип!');
+                        if(! self::min($var, $number)) {
+                            self::$errors[] = "Строка $paramName должна быть не меньше \"$number\" символов, а у вас ";
+                        }
                     }
                     break;
 
@@ -93,12 +91,12 @@ class Validator
                     $number = self::getIntInParam($option);
                     if(self::$var_type === 'int') {
                         if(! (int)$var <= $number) {
-                            self::$errors[] = 'Число должно быть меньше ' . $number;
+                            self::$errors[] = "$paramName должен быть меньше $number";
                         }
                     } elseif (self::$var_type === 'str') {
                         if(!self::max($var, $number)) {
 
-                            self::$errors[] = ' Строка должна быть не больше ' . $number;
+                            self::$errors[] = "Строка $paramName должна быть не больше $number";
                         }
                     } else {
                        echo 'Для проверки на max нужно указать тип!'; exit();
@@ -128,7 +126,7 @@ class Validator
      * @return bool
      */
     private static function min($var, $length) {
-        return $length >= iconv_strlen($var, 'UTF8');
+        return iconv_strlen($var, 'UTF8') >= $length  ;
     }
 
     private static function getIntInParam($string, $separator = '=') {
